@@ -1,0 +1,332 @@
+diff -rupN Original_Nov14/pages/DeletableListDelegateSmall.qml Weekday/pages/DeletableListDelegateSmall.qml
+--- Original_Nov14/pages/DeletableListDelegateSmall.qml	1970-01-01 01:00:00.000000000 +0100
++++ Weekday/pages/DeletableListDelegateSmall.qml	2014-11-04 12:53:42.644155105 +0100
+@@ -0,0 +1,76 @@
++import QtQuick 2.0
++import Sailfish.Silica 1.0
++import org.nemomobile.calendar 1.0
++import Calendar.syncHelper 1.0
++
++Item {
++    id: root
++    height: eld.height + ((_contextMenu && _contextMenu.parent == root) ? _contextMenu.height : 0)
++    width: ListView.view.width
++
++    property alias activeDay: eld.activeDay
++    property QtObject _contextMenu
++
++    Component {
++        id: contextMenuComponent
++        ContextMenu {
++            id: contextMenu
++            MenuItem {
++                // "Edit"
++                text: qsTrId("calendar-day-edit")
++                onClicked: {
++                    pageStack.push("EventEditPage.qml", { event: model.event })
++                }
++            }
++            MenuItem {
++                //% "Delete"
++                text: qsTrId("calendar-day-delete")
++                onClicked: {
++                    if (model.event.recur != CalendarEvent.RecurOnce) {
++                        pageStack.push("EventDeletePage.qml",
++                                       { uniqueId: model.event.uniqueId, startTime: model.occurrence.startTime })
++                    } else {
++                        contextMenu.parent.deleteActivated()
++                    }
++                }
++            }
++        }
++    }
++
++    Connections {
++        id: dayConnection
++        ignoreUnknownSignals: true
++        onStartDateChanged: {
++            eld.remorse().cancel()
++            target = null
++            model.occurrence.remove()
++        }
++    }
++
++    function deleteActivated() {
++        // Assuming id/property. Need to trigger deletion before day change refreshes content.
++        // RemorseItem itself would try to execute its command, but model target might be already deleted.
++        dayConnection.target = view.model
++        eld.remorse().execute(root, qsTrId("calendar-event-deleting"),
++                              function() {
++                                  model.occurrence.remove();
++                                  // TODO: check calendarId and only sync if syncable
++                                  app.syncTrigger.triggerSyncDelayed(200,
++                                                                     SyncHelper.UpdateSync,
++                                                                     SyncHelper.SyncIfAlwaysUpToDateSet,
++                                                                     [0])
++                              })
++    }
++    EventListDelegateSmall {
++        id: eld
++        width: parent.width
++        menuOpen: _contextMenu && _contextMenu.active
++        onPressAndHold: {
++            if (event.readonly)
++                return
++            if (!_contextMenu) _contextMenu = contextMenuComponent.createObject(root)
++            _contextMenu.show(root)
++        }
++    }
++}
++
+diff -rupN Original_Nov14/pages/EventListDelegateSmall.qml Weekday/pages/EventListDelegateSmall.qml
+--- Original_Nov14/pages/EventListDelegateSmall.qml	1970-01-01 01:00:00.000000000 +0100
++++ Weekday/pages/EventListDelegateSmall.qml	2014-11-04 12:53:42.647488379 +0100
+@@ -0,0 +1,72 @@
++import QtQuick 2.0
++import Sailfish.Silica 1.0
++
++BackgroundItem {
++    id: root
++
++    property date activeDay
++    property RemorseItem _remorse
++    property bool menuOpen
++
++    function remorse() {
++        if (_remorse == null)
++            _remorse = remorseComponent.createObject(root)
++        return _remorse
++    }
++
++    highlighted: down || menuOpen
++    highlightedColor: menuOpen ? "transparent" : Theme.rgba(Theme.highlightBackgroundColor, Theme.highlightBackgroundOpacity)
++    height: Theme.fontSizeMedium
++    width: ListView.view.width
++
++    Component {
++        id: remorseComponent
++        RemorseItem {}
++    }
++
++    Row {
++        height: Theme.fontSizeSmall
++        anchors.verticalCenter: parent.verticalCenter
++        x: Theme.paddingSmall
++        spacing: Theme.paddingSmall
++
++        Rectangle {
++            width: Theme.paddingSmall
++            radius: Math.round(width/3)
++            color: model.event.color
++            height: parent.height
++        }
++
++        Row {
++            height: parent.height
++            EventTimeLabel {
++                allDay: model.event.allDay
++                startTime: model.occurrence.startTime
++                endTime: model.occurrence.endTime
++                activeDay: root.activeDay
++                height: parent.height
++                font.pixelSize: Theme.fontSizeTiny
++                color: root.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
++            }
++            Label {
++                text: ": "
++                height: parent.height
++                font.pixelSize: Theme.fontSizeTiny
++                color: root.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
++
++            }
++            Label {
++                height: parent.height
++                width: root.width - 3*Theme.paddingMedium - Theme.paddingSmall
++                text: model.event.displayLabel
++                font.pixelSize: Theme.fontSizeSmall
++                truncationMode: TruncationMode.Fade
++                color: root.highlighted ? Theme.highlightColor : Theme.primaryColor
++            }
++        }
++    }
++
++    onClicked: pageStack.push("EventViewPage.qml", { uniqueId: model.event.uniqueId,
++                                                     startTime: model.occurrence.startTime,
++                                                     remorse: function(title, action) { remorse().execute(root, title, action) } });
++}
+diff -rupN Original_Nov14/pages/MonthPage.qml Weekday/pages/MonthPage.qml
+--- Original_Nov14/pages/MonthPage.qml	2014-11-04 13:10:28.406279523 +0100
++++ Weekday/pages/MonthPage.qml	2014-11-04 13:23:20.749219206 +0100
+@@ -59,6 +59,11 @@ Page {
+             }
+             */
+             MenuItem {
++                //% "Show agenda"
++                text: qsTrId("calendar-me-show_agenda")
++                onClicked: pageStack.push("WeekPage.qml", {date: datePicker.date})
++            }
++            MenuItem {
+                 //% "New event"
+                 text: qsTrId("calendar-me-new_event")
+                 onClicked: root.addEvent()
+diff -rupN Original_Nov14/pages/Util.js Weekday/pages/Util.js
+--- Original_Nov14/pages/Util.js	2014-11-04 13:10:28.412946070 +0100
++++ Weekday/pages/Util.js	2014-11-04 13:26:26.199256504 +0100
+@@ -35,3 +35,18 @@ function formatDateWeekday(d) {
+ function capitalize(string) {
+     return string.charAt(0).toUpperCase() + string.substr(1)
+ }
++
++// Qt.weekNumber() is not available in Qt5 - using:
++// http://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php
++function _weekNumberForDate(dt) {
++    //return Qt.weekNumber(dt)
++
++    // Set to nearest Thursday: current date + 4 - current day number
++    // Make Sunday's day number 7
++    dt.setDate(dt.getDate() + 4 - (dt.getDay()||7))
++    // Get first day of year
++    var yearStart = new Date(dt.getFullYear(),0,1)
++    // Calculate full weeks to nearest Thursday
++    var weekNo = Math.ceil(( ( (dt - yearStart) / 86400000) + 1)/7)
++    return weekNo
++}
+diff -rupN Original_Nov14/pages/WeekPage.qml Weekday/pages/WeekPage.qml
+--- Original_Nov14/pages/WeekPage.qml	1970-01-01 01:00:00.000000000 +0100
++++ Weekday/pages/WeekPage.qml	2014-11-04 12:53:42.650821654 +0100
+@@ -0,0 +1,135 @@
++import QtQuick 2.0
++import Sailfish.Silica 1.0
++import org.nemomobile.calendar 1.0
++import "Util.js" as Util
++
++Page {
++    id: root
++
++    property date date
++
++    SilicaGridView {
++        id: weekGrid
++        anchors.fill: parent
++        header: Item {
++            height: pageHeader.height + Theme.paddingLarge
++            width: parent.width
++
++            property int daynr: {
++                //3 Jan 2000 was a Monday
++                if (Qt.formatDateTime(new Date(2000, 0, 3, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 0
++                } else if (Qt.formatDateTime(new Date(2000, 0, 4, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 1
++                }else if (Qt.formatDateTime(new Date(2000, 0, 5, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 2
++                } else if (Qt.formatDateTime(new Date(2000, 0, 6, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 3
++                }else if (Qt.formatDateTime(new Date(2000, 0, 7, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 4
++                } else if (Qt.formatDateTime(new Date(2000, 0, 8, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 5
++                } else {
++                return 6
++                }
++            }
++
++            PageHeader {
++                id: pageHeader
++                title: (Qt.formatDate(QtDate.addDays(root.date, 0-daynr), "dd.MMM yy") + " - " + Qt.formatDate(QtDate.addDays(root.date, 0-daynr+6), "dd.MMM yy"))
++            }
++            Text {
++                y: Theme.itemSizeSmall
++                anchors {
++                    right: parent.right
++                    rightMargin: Theme.paddingLarge
++                }
++                color: Theme.highlightColor
++                font.pixelSize: Theme.fontSizeMedium
++                opacity: 0.8
++                text: ("week " +  Util._weekNumberForDate(root.date))
++//                text: (Format.formatDate(QtDate.addDays(root.date, 0-daynr),Formatter.DateLong) + " - " + Format.formatDate(QtDate.addDays(root.date, 0-daynr+7), "dd"))
++            }
++        }
++        cellHeight: parent.height/5
++        cellWidth: parent.width/2
++
++        model: ListModel {
++            ListElement { day: "Monday" }
++            ListElement { day: "Tuesday" }
++            ListElement { day: "Wednesday" }
++            ListElement { day: "Thursday" }
++            ListElement { day: "Friday" }
++            ListElement { day: "Saturday" }
++            ListElement { day: "Sunday" }
++
++        }
++        delegate: Item {
++            width: weekGrid.cellWidth
++            height: weekGrid.cellHeight
++
++            id: delDay
++
++            signal clicked
++
++            BackgroundItem {
++                id: backgroundItem
++                anchors.horizontalCenter: label.Center
++                width: weekGrid.cellWidth - 2 * Theme.paddingMedium
++                height: label.height + Theme.paddingSmall
++                onClicked: pageStack.push("DayPage.qml", { "date": QtDate.addDays(root.date, 0-daynr+index)})
++            }
++
++            Label {
++                id: label
++                text: Qt.formatDateTime(QtDate.addDays(root.date, 0-daynr+index), "dddd dd.MM")
++            }
++
++//            Label {
++//                id: label
++//                anchors.right: parent.right
++//                anchors.rightMargin: Theme.paddingLarge
++//                text: day
++//                color: backgroundItem.highlighted ? Theme.highlightColor : Theme.primaryColor
++//                font.pixelSize: Theme.fontSizeLarge
++//            }
++
++            property int daynr: {
++                //3 Jan 2000 was a Monday
++                if (Qt.formatDateTime(new Date(2000, 0, 3, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 0
++                } else if (Qt.formatDateTime(new Date(2000, 0, 4, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 1
++                }else if (Qt.formatDateTime(new Date(2000, 0, 5, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 2
++                } else if (Qt.formatDateTime(new Date(2000, 0, 6, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 3
++                }else if (Qt.formatDateTime(new Date(2000, 0, 7, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 4
++                } else if (Qt.formatDateTime(new Date(2000, 0, 8, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
++                    return 5
++                } else {
++                return 6
++                }
++            }
++
++            ListView {
++                anchors.top: backgroundItem.bottom
++                height: weekGrid.cellHeight-backgroundItem.height
++                width: weekGrid.cellWidth
++                clip: true
++                model: AgendaModel {
++                    startDate: QtDate.addDays(root.date, index-daynr)
++                    endDate: QtDate.addDays(root.date, index-daynr)
++                }
++
++                delegate: DeletableListDelegateSmall {}
++            }
++
++        }
++
++        VerticalScrollDecorator {}
++    }
++}
++
++
