@@ -5,12 +5,41 @@ import "Util.js" as Util
 
 Page {
     id: root
-
     property date date
+    function addEvent() {
+        var now = new Date
+        var d = root.date
+
+        if (now.getHours() < 23 && now.getMinutes() > 0) {
+            d.setHours(now.getHours() + 1)
+        }
+
+        d.setMinutes(0)
+        d.setSeconds(0)
+
+        pageStack.push("EventEditPage.qml", { defaultDate: d })
+    }
 
     SilicaGridView {
         id: weekGrid
         anchors.fill: parent
+
+        PullDownMenu {
+            id: pullDownMenu
+            MenuItem {
+                //% "Go to today"
+                text: qsTrId("calendar-me-go_to_today")
+                onClicked: pageStack.push("WeekPage.qml", {date: new Date()})
+            }
+
+            MenuItem {
+                //% "New event"
+                text: qsTrId("calendar-me-new_event")
+                onClicked: root.addEvent()
+//                onClicked: pageStack.push("EventEditPage.qml", { defaultDate: root.date })
+            }
+        }
+
         header: Item {
             height: pageHeader.height + Theme.paddingLarge
             width: parent.width
@@ -36,7 +65,7 @@ Page {
 
             PageHeader {
                 id: pageHeader
-                title: (Qt.formatDate(QtDate.addDays(root.date, 0-daynr), "dd.MMM yy") + " - " + Qt.formatDate(QtDate.addDays(root.date, 0-daynr+6), "dd.MMM yy"))
+                title: (Qt.formatDate(QtDate.addDays(root.date, 0-daynr), "dd.MMM.yy") + " - " + Qt.formatDate(QtDate.addDays(root.date, 0-daynr+6), "dd.MMM.yy"))
             }
             Text {
                 y: Theme.itemSizeSmall
@@ -47,7 +76,7 @@ Page {
                 color: Theme.highlightColor
                 font.pixelSize: Theme.fontSizeMedium
                 opacity: 0.8
-                text: ("week " +  Util._weekNumberForDate(root.date))
+                text: ("week "+ Util._weekNumberForDate(root.date))
 //                text: (Format.formatDate(QtDate.addDays(root.date, 0-daynr),Formatter.DateLong) + " - " + Format.formatDate(QtDate.addDays(root.date, 0-daynr+7), "dd"))
             }
         }
@@ -72,17 +101,26 @@ Page {
 
             signal clicked
 
+//            Rectangle {
+//                width: weekGrid.cellWidth+2
+//                height: weekGrid.cellHeight+2
+//                color: "transparent"
+//                border.color: Theme.primaryColor
+//                border.width: 2
+
+//            }
+
             BackgroundItem {
                 id: backgroundItem
                 anchors.horizontalCenter: label.Center
                 width: weekGrid.cellWidth - 2 * Theme.paddingMedium
                 height: label.height + Theme.paddingSmall
-                onClicked: pageStack.push("DayPage.qml", { "date": QtDate.addDays(root.date, 0-daynr+index)})
+                onClicked: pageStack.push("DayPage.qml", QtDate.addDays(root.date, 0-daynr+index))
             }
 
             Label {
                 id: label
-                text: Qt.formatDateTime(QtDate.addDays(root.date, 0-daynr+index), "dddd dd.MM")
+                text: "  " + day
             }
 
 //            Label {
