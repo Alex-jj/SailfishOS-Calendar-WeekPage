@@ -121,7 +121,7 @@ Page {
 
             Label {
                 id: label
-                text: "  " + day
+                text: Qt.formatDateTime(QtDate.addDays(root.date, 0-daynr+index), "dddd dd.MM")
             }
 
 //            Label {
