@@ -91,6 +91,7 @@ Page {
             ListElement { day: "Friday" }
             ListElement { day: "Saturday" }
             ListElement { day: "Sunday" }
+            //ListElement { day: "none" }
 
         }
         delegate: Item {
@@ -146,8 +147,11 @@ Page {
                     return 4
                 } else if (Qt.formatDateTime(new Date(2000, 0, 8, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
                     return 5
-                } else {
+                } else  if (Qt.formatDateTime(new Date(2000, 0, 9, 12), "ddd") === Qt.formatDateTime(root.date, "ddd")) {
                 return 6
+                }
+                else {
+                    return 7
                 }
             }
 
@@ -166,8 +170,52 @@ Page {
 
         }
 
+        BackgroundItem {
+            id: next
+            height: weekGrid.cellHeight
+            width: weekGrid.cellWidth/2
+            anchors.right: parent.right
+            anchors.bottom: weekGrid.bottom
+            Column {
+                //anchors: parent.fill
+                Label {
+                    width: next.width
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "next"
+                }
+                Label {
+                    width: next.width
+                    text: "week"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+            onClicked: pageStack.push("WeekPage.qml", {date: QtDate.addDays(root.date, 7)})
+        }
+        BackgroundItem {
+            id: prev
+            height: weekGrid.cellHeight
+            width: weekGrid.cellWidth/2
+            anchors.right: next.left
+            anchors.bottom: weekGrid.bottom
+            Column {
+                //achors: parent.fill
+                Label {
+                    width: prev.width
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "previous"
+                }
+                Label {
+                    width: prev.width
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "week"
+                }
+            }
+            onClicked: pageStack.push("WeekPage.qml", {date: QtDate.addDays(root.date, -7)})
+        }
+
         VerticalScrollDecorator {}
     }
+
 }
 
 
