@@ -1,9 +1,8 @@
 {
-	"name": "WeekPage",
-	"decription": "adds WeekPage to Calendar, 
-accessable over pulley-menu on MonthPage",
-	"category": "calendar",
-	"infos": {
-		"maintainer": "Alex-jj"
+    "name": "WeekPage",
+    "description": "adds WeekPage to Calendar, accessable over pulley-menu on MonthPage",
+    "category": "calendar",
+    "infos": {
+        "maintainer": "Alex-jj"
 	}
 }
