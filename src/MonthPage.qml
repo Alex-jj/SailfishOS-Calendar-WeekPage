@@ -60,7 +60,7 @@ Page {
             */
             MenuItem {
                 //% "Show WeekPage"
-                text: qsTrId("calendar-me-show_week")
+                text: qsTrId("WeekPage")
                 onClicked: pageStack.push("WeekPage.qml", {date: datePicker.date})
             }
             MenuItem {

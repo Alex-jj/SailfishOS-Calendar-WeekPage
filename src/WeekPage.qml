@@ -38,6 +38,11 @@ Page {
                 onClicked: root.addEvent()
 //                onClicked: pageStack.push("EventEditPage.qml", { defaultDate: root.date })
             }
+            MenuItem {
+                //% "Go to MonthPage"
+                text: qsTrId("MonthPage")
+                onClicked: pageStack.push("MonthPage.qml", { defaultDate: root.date })
+            }
         }
 
         header: Item {
