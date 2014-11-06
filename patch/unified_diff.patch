@@ -1,5 +1,5 @@
-diff -ruN Original_Nov14/pages/DeletableListDelegateSmall.qml Changed/pages/DeletableListDelegateSmall.qml
---- Original_Nov14/pages/DeletableListDelegateSmall.qml	1970-01-01 01:00:00.000000000 +0100
+diff -ruN original/usr/share/jolla-calendar/pages/DeletableListDelegateSmall.qml Changed/pages/DeletableListDelegateSmall.qml
+--- original/usr/share/jolla-calendar/pages/DeletableListDelegateSmall.qml	1970-01-01 01:00:00.000000000 +0100
 +++ Changed/pages/DeletableListDelegateSmall.qml	2014-11-04 12:53:42.644155000 +0100
 @@ -0,0 +1,76 @@
 +import QtQuick 2.0
@@ -78,8 +78,8 @@ diff -ruN Original_Nov14/pages/DeletableListDelegateSmall.qml Changed/pages/Dele
 +    }
 +}
 +
-diff -ruN Original_Nov14/pages/EventListDelegateSmall.qml Changed/pages/EventListDelegateSmall.qml
---- Original_Nov14/pages/EventListDelegateSmall.qml	1970-01-01 01:00:00.000000000 +0100
+diff -ruN original/usr/share/jolla-calendar/pages/EventListDelegateSmall.qml Changed/pages/EventListDelegateSmall.qml
+--- original/usr/share/jolla-calendar/pages/EventListDelegateSmall.qml	1970-01-01 01:00:00.000000000 +0100
 +++ Changed/pages/EventListDelegateSmall.qml	2014-11-04 21:38:22.803958000 +0100
 @@ -0,0 +1,72 @@
 +import QtQuick 2.0
@@ -154,23 +154,23 @@ diff -ruN Original_Nov14/pages/EventListDelegateSmall.qml Changed/pages/EventLis
 +                                                     startTime: model.occurrence.startTime,
 +                                                     remorse: function(title, action) { remorse().execute(root, title, action) } });
 +}
-diff -ruN Original_Nov14/pages/MonthPage.qml Changed/pages/MonthPage.qml
---- Original_Nov14/pages/MonthPage.qml	2014-11-04 13:10:28.406279523 +0100
-+++ Changed/pages/MonthPage.qml	2014-11-05 19:15:51.160272436 +0100
+diff -ruN original/usr/share/jolla-calendar/pages/MonthPage.qml Changed/pages/MonthPage.qml
+--- original/usr/share/jolla-calendar/pages/MonthPage.qml	2014-11-04 13:10:28.406279523 +0100
++++ Changed/pages/MonthPage.qml	2014-11-06 15:06:26.672426000 +0100
 @@ -59,6 +59,11 @@
              }
              */
              MenuItem {
 +                //% "Show WeekPage"
-+                text: qsTrId("calendar-me-show_week")
++                text: qsTrId("WeekPage")
 +                onClicked: pageStack.push("WeekPage.qml", {date: datePicker.date})
 +            }
 +            MenuItem {
                  //% "New event"
                  text: qsTrId("calendar-me-new_event")
                  onClicked: root.addEvent()
-diff -ruN Original_Nov14/pages/Util.js Changed/pages/Util.js
---- Original_Nov14/pages/Util.js	2014-11-04 13:10:28.412946070 +0100
+diff -ruN original/usr/share/jolla-calendar/pages/Util.js Changed/pages/Util.js
+--- original/usr/share/jolla-calendar/pages/Util.js	2014-11-04 13:10:28.412946070 +0100
 +++ Changed/pages/Util.js	2014-11-04 13:26:26.199256000 +0100
 @@ -35,3 +35,18 @@
  function capitalize(string) {
@@ -191,10 +191,10 @@ diff -ruN Original_Nov14/pages/Util.js Changed/pages/Util.js
 +    var weekNo = Math.ceil(( ( (dt - yearStart) / 86400000) + 1)/7)
 +    return weekNo
 +}
-diff -ruN Original_Nov14/pages/WeekPage.qml Changed/pages/WeekPage.qml
---- Original_Nov14/pages/WeekPage.qml	1970-01-01 01:00:00.000000000 +0100
-+++ Changed/pages/WeekPage.qml	2014-11-05 18:09:05.750982000 +0100
-@@ -0,0 +1,221 @@
+diff -ruN original/usr/share/jolla-calendar/pages/WeekPage.qml Changed/pages/WeekPage.qml
+--- original/usr/share/jolla-calendar/pages/WeekPage.qml	1970-01-01 01:00:00.000000000 +0100
++++ Changed/pages/WeekPage.qml	2014-11-06 15:08:25.929582000 +0100
+@@ -0,0 +1,226 @@
 +import QtQuick 2.0
 +import Sailfish.Silica 1.0
 +import org.nemomobile.calendar 1.0
@@ -234,6 +234,11 @@ diff -ruN Original_Nov14/pages/WeekPage.qml Changed/pages/WeekPage.qml
 +                text: qsTrId("calendar-me-new_event")
 +                onClicked: root.addEvent()
 +//                onClicked: pageStack.push("EventEditPage.qml", { defaultDate: root.date })
++            }
++            MenuItem {
++                //% "Go to MonthPage"
++                text: qsTrId("MonthPage")
++                onClicked: pageStack.push("MonthPage.qml", { defaultDate: root.date })
 +            }
 +        }
 +
