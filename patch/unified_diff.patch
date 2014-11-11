@@ -1,6 +1,6 @@
-diff -ruN original/usr/share/jolla-calendar/pages/DeletableListDelegateSmall.qml patched/usr/share/jolla-calender/pages/DeletableListDelegateSmall.qml
+diff -ruN original/usr/share/jolla-calendar/pages/DeletableListDelegateSmall.qml patched/usr/share/jolla-calendar/pages/DeletableListDelegateSmall.qml
 --- original/usr/share/jolla-calendar/pages/DeletableListDelegateSmall.qml	1970-01-01 01:00:00.000000000 +0100
-+++ patched/usr/share/jolla-calender/pages/DeletableListDelegateSmall.qml	2014-11-04 12:53:42.644155000 +0100
++++ patched/usr/share/jolla-calendar/pages/DeletableListDelegateSmall.qml	2014-11-04 12:53:42.644155000 +0100
 @@ -0,0 +1,76 @@
 +import QtQuick 2.0
 +import Sailfish.Silica 1.0
@@ -78,9 +78,9 @@ diff -ruN original/usr/share/jolla-calendar/pages/DeletableListDelegateSmall.qml
 +    }
 +}
 +
-diff -ruN original/usr/share/jolla-calendar/pages/EventListDelegateSmall.qml patched/usr/share/jolla-calender/pages/EventListDelegateSmall.qml
+diff -ruN original/usr/share/jolla-calendar/pages/EventListDelegateSmall.qml patched/usr/share/jolla-calendar/pages/EventListDelegateSmall.qml
 --- original/usr/share/jolla-calendar/pages/EventListDelegateSmall.qml	1970-01-01 01:00:00.000000000 +0100
-+++ patched/usr/share/jolla-calender/pages/EventListDelegateSmall.qml	2014-11-04 21:38:22.803958000 +0100
++++ patched/usr/share/jolla-calendar/pages/EventListDelegateSmall.qml	2014-11-04 21:38:22.803958000 +0100
 @@ -0,0 +1,72 @@
 +import QtQuick 2.0
 +import Sailfish.Silica 1.0
@@ -154,9 +154,9 @@ diff -ruN original/usr/share/jolla-calendar/pages/EventListDelegateSmall.qml pat
 +                                                     startTime: model.occurrence.startTime,
 +                                                     remorse: function(title, action) { remorse().execute(root, title, action) } });
 +}
-diff -ruN original/usr/share/jolla-calendar/pages/MonthPage.qml patched/usr/share/jolla-calender/pages/MonthPage.qml
+diff -ruN original/usr/share/jolla-calendar/pages/MonthPage.qml patched/usr/share/jolla-calendar/pages/MonthPage.qml
 --- original/usr/share/jolla-calendar/pages/MonthPage.qml	2014-11-04 13:10:28.406279523 +0100
-+++ patched/usr/share/jolla-calender/pages/MonthPage.qml	2014-11-06 15:06:26.672426000 +0100
++++ patched/usr/share/jolla-calendar/pages/MonthPage.qml	2014-11-06 15:06:26.672426000 +0100
 @@ -59,6 +59,11 @@
              }
              */
@@ -169,9 +169,9 @@ diff -ruN original/usr/share/jolla-calendar/pages/MonthPage.qml patched/usr/shar
                  //% "New event"
                  text: qsTrId("calendar-me-new_event")
                  onClicked: root.addEvent()
-diff -ruN original/usr/share/jolla-calendar/pages/Util.js patched/usr/share/jolla-calender/pages/Util.js
+diff -ruN original/usr/share/jolla-calendar/pages/Util.js patched/usr/share/jolla-calendar/pages/Util.js
 --- original/usr/share/jolla-calendar/pages/Util.js	2014-11-04 13:10:28.412946070 +0100
-+++ patched/usr/share/jolla-calender/pages/Util.js	2014-11-04 13:26:26.199256000 +0100
++++ patched/usr/share/jolla-calendar/pages/Util.js	2014-11-04 13:26:26.199256000 +0100
 @@ -35,3 +35,18 @@
  function capitalize(string) {
      return string.charAt(0).toUpperCase() + string.substr(1)
@@ -191,9 +191,9 @@ diff -ruN original/usr/share/jolla-calendar/pages/Util.js patched/usr/share/joll
 +    var weekNo = Math.ceil(( ( (dt - yearStart) / 86400000) + 1)/7)
 +    return weekNo
 +}
-diff -ruN original/usr/share/jolla-calendar/pages/WeekPage.qml patched/usr/share/jolla-calender/pages/WeekPage.qml
+diff -ruN original/usr/share/jolla-calendar/pages/WeekPage.qml patched/usr/share/jolla-calendar/pages/WeekPage.qml
 --- original/usr/share/jolla-calendar/pages/WeekPage.qml	1970-01-01 01:00:00.000000000 +0100
-+++ patched/usr/share/jolla-calender/pages/WeekPage.qml	2014-11-06 15:08:25.929582000 +0100
++++ patched/usr/share/jolla-calendar/pages/WeekPage.qml	2014-11-06 15:08:25.929582000 +0100
 @@ -0,0 +1,226 @@
 +import QtQuick 2.0
 +import Sailfish.Silica 1.0
